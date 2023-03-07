@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { getUrls } from '../../apiCalls';
+import { getUrls, postUrls } from '../../apiCalls';
 import UrlContainer from '../UrlContainer/UrlContainer';
 import UrlForm from '../UrlForm/UrlForm';
 
@@ -14,19 +14,16 @@ export class App extends Component {
   }
 
   postUrl = (data) => {
-    getUrls(data)
-    .then(response => {
-      if(response.statusText === 'Created') {
-        return response.json()
-      } else { throw new Error('Issue creating url') }
-    })
+    postUrls(data)
     .then(data => this.setState({ urls: [...this.state.urls, data] }))
     .catch(() => this.setState({ isLoading: 'error' }))
   }
 
   componentDidMount() {
     getUrls()
-    .then(data => this.setState({ isLoading: false, urls: [...data.urls] }))
+    .then(data => {
+      this.setState({ isLoading: false, urls: [...data.urls] })
+    })
     .catch(() => this.setState({ isLoading: 'error' }))
   }
 
@@ -38,9 +35,10 @@ export class App extends Component {
           <UrlForm postUrl={this.postUrl} />
         </header>
         {
-        this.state.isLoading === 'error' ? <h2>Huh, something went wrong!</h2>
-        : this.state.isLoading === 'true' ? <h2>Loading...</h2>
-        : <UrlContainer urls={this.state.urls}/> }
+          this.state.isLoading === 'error' ? <h2>Huh, something went wrong!</h2>
+          : this.state.isLoading === 'true' ? <h2>Loading...</h2>
+          : <UrlContainer urls={this.state.urls}/> 
+        }
       </main>
     );
   }
