@@ -8,11 +8,15 @@ export class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      urls: []
+      urls: [],
+      isLoading: true,
     }
   }
 
   componentDidMount() {
+    getUrls()
+    .then(data => this.setState({ isLoading: false, urls: [...data.urls] }))
+    .catch(() => console.log('error'))
   }
 
   render() {
@@ -23,7 +27,8 @@ export class App extends Component {
           <UrlForm />
         </header>
 
-        <UrlContainer urls={this.state.urls}/>
+        {this.state.isLoading ? <h2>Loading...</h2>
+        : <UrlContainer urls={this.state.urls}/> }
       </main>
     );
   }
