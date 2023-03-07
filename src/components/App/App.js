@@ -9,14 +9,25 @@ export class App extends Component {
     super(props);
     this.state = {
       urls: [],
-      isLoading: true,
+      isLoading: 'true',
     }
+  }
+
+  postUrl = (data) => {
+    getUrls(data)
+    .then(response => {
+      if(response.statusText === 'Created') {
+        return response.json()
+      } else { throw new Error('Issue creating url') }
+    })
+    .then(data => this.setState({ urls: [...this.state.urls, data] }))
+    .catch(() => this.setState({ isLoading: 'error' }))
   }
 
   componentDidMount() {
     getUrls()
     .then(data => this.setState({ isLoading: false, urls: [...data.urls] }))
-    .catch(() => console.log('error'))
+    .catch(() => this.setState({ isLoading: 'error' }))
   }
 
   render() {
@@ -24,10 +35,11 @@ export class App extends Component {
       <main className="App">
         <header>
           <h1>URL Shortener</h1>
-          <UrlForm />
+          <UrlForm postUrl={this.postUrl} />
         </header>
-
-        {this.state.isLoading ? <h2>Loading...</h2>
+        {
+        this.state.isLoading === 'error' ? <h2>Huh, something went wrong!</h2>
+        : this.state.isLoading === 'true' ? <h2>Loading...</h2>
         : <UrlContainer urls={this.state.urls}/> }
       </main>
     );
